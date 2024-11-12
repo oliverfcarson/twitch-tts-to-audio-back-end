@@ -26,9 +26,9 @@ pubnub.addListener({
         twitchClient.on('message', async (channel, tags, message, self) => {
             if (self) return;
 
-            const userMessage = `${tags['display-name']} says ${message}`;
-            console.log("Message:", userMessage);
-            const gtts = new Gtts(userMessage, 'en');
+            const userMessage = `${tags['display-name']}: ${message}`;
+            console.log(userMessage);
+            const gtts = new Gtts(message, 'en');
             const filePath = `./${Date.now()}.mp3`;
             const compressedFilePath = `./${Date.now()}_compressed.mp3`;
             
@@ -61,8 +61,9 @@ pubnub.addListener({
                         messageId,
                         chunkIndex: i,
                         totalChunks,
-                        text: userMessage, // Optional: send text in each chunk if needed
-                        audioChunk: chunk
+                        text: message, // Optional: send text in each chunk if needed
+                        audioChunk: chunk,
+                        name: tags['display-name']
                     })
                 });
             }
