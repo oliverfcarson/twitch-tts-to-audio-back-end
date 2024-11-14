@@ -12,12 +12,13 @@ const pubnub = new PubNub({
     uuid: 'backend'
 });
 
-pubnub.subscribe({ channels: ['twitch-channel-requests'] });
+pubnub.subscribe({ channels: ['twitch-channel-requests.*'] });
 console.log("waiting for twitch channel....");
 
 pubnub.addListener({
     message: async (msg) => {
         const channelName = msg.message.channel;
+        const pubnubChannel = `${channelName}-${msg.publisher}`;
         const twitchClient = new tmi.Client({ channels: [channelName] });
         console.log(`Received request for channel ${channelName}....`);
 
@@ -61,7 +62,7 @@ pubnub.addListener({
                 const chunk = audioData.slice(i * chunkSize, (i + 1) * chunkSize);
                 
                 await pubnub.publish({
-                    channel: channelName,
+                    channel: pubnubChannel,
                     message: JSON.stringify({
                         messageId,
                         chunkIndex: i,
