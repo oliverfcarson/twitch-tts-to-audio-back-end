@@ -51,6 +51,11 @@ pubnub.addListener({
             const totalChunks = Math.ceil(audioData.length / chunkSize);
             const messageId = crypto.randomUUID(); // Unique ID for this message
 
+            // Fire-and-forget cleanup
+            fs.unlink(filePath).catch(err => console.error(`Error cleaning up ${filePath}:`, err.message));
+            fs.unlink(compressedFilePath).catch(err => console.error(`Error cleaning up ${compressedFilePath}:`, err.message));
+
+            
             // Split and send chunks
             for (let i = 0; i < totalChunks; i++) {
                 const chunk = audioData.slice(i * chunkSize, (i + 1) * chunkSize);
@@ -67,10 +72,6 @@ pubnub.addListener({
                     })
                 });
             }
-
-            // Clean up temporary files
-            await fs.unlink(filePath);
-            await fs.unlink(compressedFilePath);
         });
     }
 });
